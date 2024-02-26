@@ -1,0 +1,31 @@
+# Author: Dennis Pohl
+
+# 1) name workflow
+name: hello-world
+
+# 2) workflow trigger event
+# push - runs workflow when push a commit or tag, or when creating a repository from a template
+on: push
+
+# 3) define a job
+# define what happens when the workflow runs. jobs run in parallel unless you tell to wait.
+jobs:
+  hello-world-job:
+    # 4) specify runner
+    # a machine that executes the jobs in a workflow.
+    # Two types of runners: a) GitHub-hosted runners and b) self-hosted runners.
+    # - a) Self-hosted runners: system that you deploy and manage on own infrastructure to execute GitHub Actions jobs
+    # - b) GitHub hosted runners: Freshly-provisioned virtual machines running Ubuntu Linux, MS Windows, or macOS.
+    runs-on: ubuntu-latest
+    # 5) add step to run action
+    # either run a) a script, or b) run an action.
+    # we'll start with: Checkout action.
+    # provides access to repository contents, which allowsrunning scripts or actions, e.g. build and test tooling.
+    steps:
+    # good practice to name step as it will be recorded in the logs
+      - name: Check out repository code
+      # specify to use checkout action
+        uses: actions/checkout@v4
+        # run a bash script
+      - run: echo "$(cat hello-world.txt)"
+    
