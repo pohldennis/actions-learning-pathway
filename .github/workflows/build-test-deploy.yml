@@ -27,3 +27,53 @@ jobs:
           node-version: '18.x'
       - run: npm install
       - run: npm test
+
+    # deploy to Github Pages
+    deploy:
+      needs: test
+      # permission keyword controls what tasks or processes the workflow can perform
+      # here: adjust permissions for GitHub token: allow workflow to access and modify parts of repository
+      permissions:
+        contents: write
+        pages: write
+        id-token: write
+      # choose deployment environment
+      environment:
+        # name of environment we want to deploy to
+        name: production
+        # url of deployment: grabs the deployed page URL from the final deployment step
+        url: ${{ steps.deployment.outputs.page_url }}
+      runs-on: ubuntu-latest
+      # since we are writing (not only reading) we need to authenticate with GitHub.
+      steps:
+        - name: checkout repo
+          uses: actions/checkout@v4
+          with:
+            token: ${{ secrets.GITHUB_TOKEN }}
+        # remember: every job runs independently
+        - name: use node.js
+          uses: actions/setup-node@v4
+          with:
+            node-version: '18.x'
+        - name: configure github pages
+          uses: actions/configure-pages@v3
+          with:
+            static_site_generator: next
+        - run: npm install
+        - run: npm run build
+        # In the CI/CD context, an 'artifact; is a package or set of files,
+        # resulting from a build process, that are meant for distribution
+        # or deployment, the static site that Next.js build during the 
+        # `npm run build` step.
+        # The `upload-pages-artifact` actions uploads the artifacts to Pages.
+        - name: upload artifacts
+          uses: actions/upload-pages-artifact@v1
+          with:
+            path: "./out"
+        # deploy to Pages - takes our prepared artifacts which we built and uploaded
+        # in the previous steps, and deploys them directly to Pages.
+        - name: deploy
+        # label step, a unique identifier. useful if we need to reference
+        # this particular step in subsequent tasks, or check on its status.
+          id: deployment
+          uses: actions/deploy-pages@v1
