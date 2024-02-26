@@ -27,5 +27,5 @@ jobs:
       # specify to use checkout action
         uses: actions/checkout@v4
         # run a bash script
-      - run: echo "$(cat hello-world.txt)"
+      - run: echo "$(cat hello_world.txt)"
     
